@@ -29,7 +29,7 @@ CREATE TABLE MARCA (
 
 CREATE TABLE MODELO (
     id_modelo         INT            NOT NULL,
-    denominacion      VARCHAR(50)    NOT NULL,
+    denominacion      VARCHAR(80)    NOT NULL,
     version           VARCHAR(50)    NOT NULL,
     anio_fabricacion  SMALLINT       NOT NULL,
     precio_lista      DECIMAL(12,2)  NOT NULL,
@@ -43,8 +43,8 @@ CREATE TABLE MODELO (
 
 CREATE TABLE SUCURSAL (
     codigo_suc  VARCHAR(10)   NOT NULL,
-    nombre      VARCHAR(50)   NOT NULL,
-    direccion   VARCHAR(100)  NOT NULL,
+    nombre      VARCHAR(80)   NOT NULL,
+    direccion   VARCHAR(150)  NOT NULL,
     telefono    VARCHAR(20)   NOT NULL,
     correo      VARCHAR(100)  NOT NULL,
     CONSTRAINT PK_SUCURSAL PRIMARY KEY (codigo_suc)
@@ -77,9 +77,9 @@ CREATE TABLE ADMINISTRATIVO (
 /* ========== ADQUISICIÓN / PROVEEDOR ========== */
 
 CREATE TABLE PROVEEDOR (
-    cuit          VARCHAR(11)   NOT NULL,
+    cuit          VARCHAR(13)   NOT NULL,
     razon_social  VARCHAR(100)  NOT NULL,
-    domicilio     VARCHAR(100)  NOT NULL,
+    domicilio     VARCHAR(150)  NOT NULL,
     telefono      VARCHAR(20)   NOT NULL,
     correo        VARCHAR(100)  NOT NULL,
     CONSTRAINT PK_PROVEEDOR PRIMARY KEY (cuit)
@@ -88,9 +88,9 @@ CREATE TABLE PROVEEDOR (
 CREATE TABLE ADQUISICION (
     num_comprobante  VARCHAR(20)    NOT NULL,
     fecha            DATE           NOT NULL,
-    tipo_comprobante VARCHAR(20)    NOT NULL,
+    tipo_comprobante VARCHAR(30)    NOT NULL,
     importe_total    DECIMAL(14,2)  NOT NULL,
-    cuit_proveedor   VARCHAR(11)    NOT NULL,
+    cuit_proveedor   VARCHAR(13)    NOT NULL,
     CONSTRAINT PK_ADQUISICION PRIMARY KEY (num_comprobante),
     CONSTRAINT FK_ADQUISICION_PROVEEDOR FOREIGN KEY (cuit_proveedor) REFERENCES PROVEEDOR(cuit)
 );
@@ -98,8 +98,8 @@ CREATE TABLE ADQUISICION (
 -- num_comprobante NULL: unidad ingresada por parte de pago (sin adquisición)
 CREATE TABLE UNIDAD_VEHICULO (
     num_serie       VARCHAR(17)    NOT NULL,
-    num_motor       VARCHAR(20)    NOT NULL,
-    color           VARCHAR(20)    NOT NULL,
+    num_motor       VARCHAR(30)    NOT NULL,
+    color           VARCHAR(30)    NOT NULL,
     fecha_ingreso   DATE           NOT NULL,
     condicion       VARCHAR(10)    NOT NULL,
     precio_venta    DECIMAL(12,2)  NOT NULL,
@@ -111,8 +111,8 @@ CREATE TABLE UNIDAD_VEHICULO (
     CONSTRAINT FK_UNIDAD_MODELO FOREIGN KEY (id_modelo) REFERENCES MODELO(id_modelo),
     CONSTRAINT FK_UNIDAD_SUCURSAL FOREIGN KEY (codigo_suc) REFERENCES SUCURSAL(codigo_suc),
     CONSTRAINT FK_UNIDAD_ADQUISICION FOREIGN KEY (num_comprobante) REFERENCES ADQUISICION(num_comprobante),
-    CONSTRAINT CK_UNIDAD_condicion CHECK (condicion IN ('Nuevo', 'Usado')),
-    CONSTRAINT CK_UNIDAD_estado CHECK (estado_actual IN ('Disponible', 'Reservado', 'Vendido', 'Fuera de exhibición'))
+    CONSTRAINT CK_UNIDAD_condicion CHECK (condicion IN (N'Nuevo', N'Usado')),
+    CONSTRAINT CK_UNIDAD_estado CHECK (estado_actual IN (N'Disponible', N'Reservado', N'Vendido', N'Fuera de exhibición'))
 );
 
 /* ========== CLIENTE / VENTA ========== */
@@ -139,7 +139,7 @@ CREATE TABLE CONTACTO_TELEFONICO (
 
 CREATE TABLE PLANES (
     cod_plan                 VARCHAR(10)   NOT NULL,
-    descripcion              VARCHAR(50)   NOT NULL,
+    descripcion              VARCHAR(150)  NOT NULL,
     porcentaje_financiacion  DECIMAL(5,2)  NOT NULL,
     cantidad_cuotas          SMALLINT      NOT NULL,
     interes_anual            DECIMAL(5,2)  NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE PLANES (
 
 CREATE TABLE ACCESORIO (
     codigo       VARCHAR(10)    NOT NULL,
-    descripcion  VARCHAR(100)   NOT NULL,
+    descripcion  VARCHAR(150)   NOT NULL,
     precio       DECIMAL(12,2)  NOT NULL,
     disponible   BIT            NOT NULL CONSTRAINT DF_ACCESORIO_disponible DEFAULT (1),
     CONSTRAINT PK_ACCESORIO PRIMARY KEY (codigo)
@@ -186,11 +186,13 @@ CREATE TABLE PAGO (
 );
 
 -- Unidad usada entregada como parte de pago (distinta de BOLETO.num_serie)
+-- PK = un parte de pago por boleto; UNIQUE num_serie = una unidad no se entrega dos veces
 CREATE TABLE PARTE_PAGO (
     num_boleto        INT            NOT NULL,
     num_serie         VARCHAR(17)    NOT NULL,
     valor_reconocido  DECIMAL(12,2)  NOT NULL,
-    CONSTRAINT PK_PARTE_PAGO PRIMARY KEY (num_boleto, num_serie),
+    CONSTRAINT PK_PARTE_PAGO PRIMARY KEY (num_boleto),
+    CONSTRAINT UQ_PARTE_PAGO_UNIDAD UNIQUE (num_serie),
     CONSTRAINT FK_PARTE_PAGO_BOLETO FOREIGN KEY (num_boleto) REFERENCES BOLETO(num_boleto),
     CONSTRAINT FK_PARTE_PAGO_UNIDAD FOREIGN KEY (num_serie) REFERENCES UNIDAD_VEHICULO(num_serie)
 );

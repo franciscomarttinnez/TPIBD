@@ -62,11 +62,10 @@ VALUES
 (N'1FTEW1EP5PFA00007', N'MOT-F-007', N'Blanco',  '2024-06-22', N'Nuevo', 39500000.00, N'Disponible', 5, N'SUC-FOR', N'FC-A-0003'),
 (N'JTDBR32E900000008', N'MOT-T-008', N'Gris',    '2025-02-08', N'Nuevo', 29000000.00, N'Disponible', 1, N'SUC-RES', N'FC-A-0004'),
 (N'JTDBR32E900000009', N'MOT-T-009', N'Blanco',  '2025-02-08', N'Nuevo', 42500000.00, N'Reservado',  2, N'SUC-RES', N'FC-A-0004'),
-(N'LSGUD84X9EE000010', N'MOT-C-010', N'Negro',   '2025-08-15', N'Nuevo', 19800000.00, N'Disponible', 6, N'SUC-FOR', N'FC-B-0005'),
+(N'LSGUD84X9EE000010', N'MOT-C-010', N'Negro',   '2025-08-15', N'Nuevo', 19800000.00, N'Vendido',    6, N'SUC-FOR', N'FC-B-0005'),
 -- Usados por parte de pago (sin adquisición)
 (N'USEDPPAY000000011', N'MOT-U-011', N'Verde',   '2024-09-01', N'Usado', 9800000.00,  N'Vendido',    3, N'SUC-RES', NULL),
-(N'USEDPPAY000000012', N'MOT-U-012', N'Gris',    '2025-01-20', N'Usado', 12500000.00, N'Disponible', 1, N'SUC-COR', NULL),
-(N'USEDPPAY000000013', N'MOT-U-013', N'Blanco',  '2024-05-10', N'Usado', 11000000.00, N'Disponible', 3, N'SUC-RES', NULL);
+(N'USEDPPAY000000012', N'MOT-U-012', N'Gris',    '2025-01-20', N'Usado', 12500000.00, N'Disponible', 1, N'SUC-COR', NULL);
 
 INSERT INTO CLIENTE (tipo_documento, num_documento, nombre_completo, domicilio, correo) VALUES
 (N'DNI', N'30111222', N'Martín Álvarez',   N'Calle Falsa 123, Resistencia', N'martin.alvarez@mail.com'),
@@ -105,10 +104,6 @@ VALUES
 (1005, '2025-04-18', 42500000.00, N'en negociación',  N'PLAN-36', 1004, N'CUIT',N'20333444556', N'JTDBR32E900000009'),
 (1006, '2025-05-01', 15500000.00, N'cancelado',       NULL,       1003, N'DNI', N'28999888', N'WVWZZZ1JZ00000004'),
 (1007, '2025-07-10', 19800000.00, N'confirmado',      N'PLAN-24', 1004, N'DNI', N'27444333', N'LSGUD84X9EE000010');
-
-UPDATE UNIDAD_VEHICULO
-SET estado_actual = N'Vendido'
-WHERE num_serie = N'LSGUD84X9EE000010';
 
 INSERT INTO PARTE_PAGO (num_boleto, num_serie, valor_reconocido) VALUES
 (1001, N'USEDPPAY000000011', 8500000.00),

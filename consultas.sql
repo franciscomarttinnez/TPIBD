@@ -16,11 +16,12 @@ SELECT
     SUM(CASE WHEN u.condicion = N'Nuevo' THEN u.precio_venta ELSE 0 END) AS valor_0km,
     SUM(CASE WHEN u.condicion = N'Usado' THEN 1 ELSE 0 END) AS cant_usados,
     SUM(CASE WHEN u.condicion = N'Usado' THEN u.precio_venta ELSE 0 END) AS valor_usados,
-    COUNT(*) AS cant_total_disponible,
-    SUM(u.precio_venta) AS valor_total_stock
+    COUNT(u.num_serie) AS cant_total_disponible,
+    ISNULL(SUM(u.precio_venta), 0) AS valor_total_stock
 FROM SUCURSAL s
-INNER JOIN UNIDAD_VEHICULO u ON u.codigo_suc = s.codigo_suc
-WHERE u.estado_actual = N'Disponible'
+LEFT JOIN UNIDAD_VEHICULO u
+    ON u.codigo_suc = s.codigo_suc
+   AND u.estado_actual = N'Disponible'
 GROUP BY s.codigo_suc, s.nombre
 ORDER BY s.codigo_suc;
 GO
@@ -91,7 +92,7 @@ GO
 
 /*------------------------------------------------------------------------------
   5. Utilización de planes de financiación
-  Cantidad de operaciones confirmadas por plan utilizado.
+  Cantidad de operaciones confirmadas por plan; solo planes con más de una.
 ------------------------------------------------------------------------------*/
 SELECT
     p.cod_plan,
@@ -104,6 +105,7 @@ FROM PLANES p
 INNER JOIN BOLETO b ON b.cod_plan = p.cod_plan
 WHERE b.estado = N'confirmado'
 GROUP BY p.cod_plan, p.descripcion, p.cantidad_cuotas, p.porcentaje_financiacion
+HAVING COUNT(b.num_boleto) > 1
 ORDER BY cant_operaciones DESC, p.cod_plan;
 GO
 
@@ -202,6 +204,7 @@ INNER JOIN BOLETO b_venta
     ON b_venta.num_serie = u.num_serie
    AND b_venta.estado = N'confirmado'
    AND b_venta.num_boleto <> pp.num_boleto
+   AND b_venta.fecha_emision > b_entrega.fecha_emision
 ORDER BY u.fecha_ingreso;
 GO
 
